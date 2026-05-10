@@ -1,32 +1,58 @@
 export function ScienceDiagram() {
   return (
     <svg
-      viewBox="0 0 400 200"
-      className="w-full max-w-xl text-[color:var(--accent)]"
+      viewBox="0 0 600 220"
+      className="w-full max-w-2xl text-[color:var(--foreground)]"
       fill="none"
       aria-label="Activated carbon adsorbs tar and particulate as smoke passes through"
     >
-      {/* tube */}
-      <rect x="40" y="80" width="320" height="40" rx="20" stroke="currentColor" strokeWidth="2" fill="var(--surface-2)" />
+      {/* tube outline (hairline) */}
+      <rect x="80" y="80" width="440" height="60" rx="30" stroke="currentColor" strokeWidth="1" />
       {/* carbon granules */}
-      {Array.from({ length: 30 }).map((_, i) => (
+      {Array.from({ length: 36 }).map((_, i) => (
         <circle
           key={i}
-          cx={60 + (i * 9)}
-          cy={100}
-          r={3 + (i % 3)}
+          cx={100 + i * 11}
+          cy={110}
+          r={2 + (i % 3)}
           fill="currentColor"
-          fillOpacity={0.4 + (i % 4) * 0.15}
+          fillOpacity={0.25 + (i % 4) * 0.1}
         />
       ))}
       {/* arrow in */}
-      <path d="M 10 100 L 40 100" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrow)" />
-      <text x="10" y="80" fill="var(--muted)" fontSize="11">smoke in</text>
+      <line x1="20" y1="110" x2="78" y2="110" stroke="currentColor" strokeWidth="1" markerEnd="url(#arr)" />
+      <text
+        x="20"
+        y="80"
+        fill="currentColor"
+        fontFamily="var(--font-serif), Georgia, serif"
+        fontStyle="italic"
+        fontSize="14"
+      >
+        smoke in
+      </text>
       {/* arrow out */}
-      <path d="M 360 100 L 390 100" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrow)" />
-      <text x="340" y="140" fill="var(--muted)" fontSize="11">cleaner draw</text>
+      <line x1="522" y1="110" x2="580" y2="110" stroke="currentColor" strokeWidth="1" markerEnd="url(#arr)" />
+      <text
+        x="510"
+        y="160"
+        fill="currentColor"
+        fontFamily="var(--font-serif), Georgia, serif"
+        fontStyle="italic"
+        fontSize="14"
+        textAnchor="end"
+      >
+        cleaner draw
+      </text>
+      {/* tick labels under tube */}
+      <text x="80" y="180" fill="currentColor" fontSize="10" letterSpacing="0.18em">
+        IN
+      </text>
+      <text x="520" y="180" fill="currentColor" fontSize="10" letterSpacing="0.18em" textAnchor="end">
+        OUT
+      </text>
       <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
           <path d="M0,0 L0,6 L6,3 z" fill="currentColor" />
         </marker>
       </defs>
