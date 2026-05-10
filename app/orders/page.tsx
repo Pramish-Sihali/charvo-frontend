@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Separator } from "../../components/ui/separator";
 import { Skeleton } from "../../components/ui/skeleton";
 import { ApiError, api } from "../../lib/api";
 import type { Order } from "../../lib/api";
@@ -76,21 +77,24 @@ export default function OrdersPage() {
     <div className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="text-3xl font-semibold tracking-tight mb-8">Your orders</h1>
       <div className="space-y-4">
-        {orders.map((order) => (
-          <Card key={order.id} className="bg-[color:var(--surface-1)] border-[color:var(--border)]">
-            <CardHeader className="flex flex-row justify-between items-center">
-              <CardTitle className="text-base">Order #{order.id}</CardTitle>
-              <Badge className={statusVariant[order.status] ?? statusVariant.pending}>
-                {order.status}
-              </Badge>
-            </CardHeader>
-            <CardContent className="text-sm text-[color:var(--muted)] flex justify-between">
-              <span>{new Date(order.created_at).toLocaleDateString()}</span>
-              <span className="font-mono text-[color:var(--foreground)]">
-                {formatPrice(order.total_cents)}
-              </span>
-            </CardContent>
-          </Card>
+        {orders.map((order, i) => (
+          <div key={order.id}>
+            {i > 0 && <Separator className="bg-[color:var(--border)] mb-4" />}
+            <Card className="bg-[color:var(--surface-1)] border-[color:var(--border)]">
+              <CardHeader className="flex flex-row justify-between items-center">
+                <CardTitle className="text-base">Order #{order.id}</CardTitle>
+                <Badge className={statusVariant[order.status] ?? statusVariant.pending}>
+                  {order.status}
+                </Badge>
+              </CardHeader>
+              <CardContent className="text-sm text-[color:var(--muted)] flex justify-between">
+                <span>{new Date(order.created_at).toLocaleDateString()}</span>
+                <span className="font-mono text-[color:var(--foreground)]">
+                  {formatPrice(order.total_cents)}
+                </span>
+              </CardContent>
+            </Card>
+          </div>
         ))}
       </div>
     </div>

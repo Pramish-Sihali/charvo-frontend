@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { getProductById } from "../../../lib/api";
+import { getProductById, api } from "../../../lib/api";
 import { formatPrice } from "../../../lib/auth";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
@@ -21,6 +21,9 @@ export default async function ProductDetailPage({
   const { id } = await params;
   const product = await getProductById(id);
   if (!product) notFound();
+
+  const allProducts = await api.getProducts();
+  const related = allProducts.filter((p) => p.id !== id).slice(0, 3);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
@@ -97,8 +100,12 @@ export default async function ProductDetailPage({
             </p>
           ) : null}
 
-          <Button className="mt-6 bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)]">
-            Add to cart
+          <Button
+            disabled
+            className="mt-6 bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)] disabled:opacity-60 disabled:cursor-not-allowed"
+            title="Cart is coming soon"
+          >
+            Add to cart (coming soon)
           </Button>
 
           <Tabs defaultValue="overview" className="mt-10">
@@ -134,6 +141,26 @@ export default async function ProductDetailPage({
           </Tabs>
         </div>
       </div>
+
+      {related.length > 0 && (
+        <section className="mt-20">
+          <h2 className="text-xl font-semibold tracking-tight mb-6">More filters</h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {related.map((p) => (
+              <Link
+                key={p.id}
+                href={`/products/${p.id}`}
+                className="block rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-1)] p-4 hover:border-[color:var(--accent)]/40 transition-colors"
+              >
+                <p className="text-sm font-medium">{p.name}</p>
+                <p className="mt-1 text-xs text-[color:var(--accent)] font-mono">
+                  {formatPrice(p.price_cents)}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

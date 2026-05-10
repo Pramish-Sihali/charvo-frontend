@@ -81,7 +81,8 @@ If neither block import yields a usable result, the hand-built fallbacks already
 ## Known limitations
 
 - Mocked product data via the FastAPI backend; no CMS.
-- No cart / checkout / About page yet.
+- No cart / checkout / About page yet. The "Add to cart" button on product detail is intentionally disabled.
+- Product detail route is `/products/[id]` (uses the product `id` field, not a separate `slug`). If SEO-friendly slugs are needed later, add a `slug` field server-side and alias the route.
 - No light mode.
 - No real product photography (SVG placeholders).
 - `/orders/[id]` per-order detail not yet built.
