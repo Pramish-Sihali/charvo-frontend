@@ -1,82 +1,107 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { Button } from "../../components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import { api } from "../../lib/api";
 import { saveSession } from "../../lib/auth";
 
+const schema = z.object({
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(8, "At least 8 characters"),
+});
+
+type Values = z.infer<typeof schema>;
+
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const form = useForm<Values>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: "", password: "" },
+  });
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
+  const onSubmit = async (values: Values) => {
     setSubmitting(true);
     try {
-      const res = await api.login({ email, password });
-      saveSession(res.access_token, res.user);
+      const { access_token, user } = await api.login({
+        email: values.email,
+        password: values.password,
+      });
+      saveSession(access_token, user);
+      toast.success("Signed in");
       router.push("/products");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      toast.error(err instanceof Error ? err.message : "Sign-in failed");
     } finally {
       setSubmitting(false);
     }
-  }
+  };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col px-6 py-16">
-      <h1 className="text-2xl font-semibold tracking-tight mb-2">Welcome back</h1>
-      <p className="text-sm text-[color:var(--muted)] mb-8">
-        Sign in to see your orders and reorder filters.
+    <div className="mx-auto max-w-md px-6 py-16">
+      <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
+      <p className="mt-2 text-sm text-[color:var(--muted)]">
+        Welcome back.
       </p>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1.5" htmlFor="email">
-          <span className="text-sm font-medium text-[color:var(--foreground)]">Email</span>
-          <Input
-            id="email"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-5">
+          <FormField
+            control={form.control}
             name="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" autoComplete="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </label>
-        <label className="flex flex-col gap-1.5" htmlFor="password">
-          <span className="text-sm font-medium text-[color:var(--foreground)]">Password</span>
-          <Input
-            id="password"
+          <FormField
+            control={form.control}
             name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" autoComplete="current-password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </label>
-        {error && (
-          <p className="text-sm text-[color:var(--danger)]">{error}</p>
-        )}
-        <Button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)]"
-        >
-          {submitting ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)]"
+          >
+            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Sign in
+          </Button>
+        </form>
+      </Form>
       <p className="mt-6 text-sm text-[color:var(--muted)]">
-        New here?{" "}
-        <Link href="/register" className="text-[color:var(--accent)] hover:underline">
-          Create an account
+        Need an account?{" "}
+        <Link href="/register" className="text-[color:var(--accent)] hover:text-[color:var(--accent-strong)]">
+          Register
         </Link>
       </p>
     </div>
