@@ -96,4 +96,13 @@ export const api = {
   getMyOrders: () => request<Order[]>("/api/orders/me", { auth: true }),
 };
 
+export async function getProducts(): Promise<Product[]> {
+  return api.getProducts();
+}
+
+export async function getProductById(id: string): Promise<Product | null> {
+  const products = await getProducts();
+  return products.find((p) => p.id === id) ?? null;
+}
+
 export { ApiError };
