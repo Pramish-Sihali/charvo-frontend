@@ -1,17 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import { getProductById, api } from "../../../lib/api";
+import { Asterisk } from "../../../components/editorial/Asterisk";
+import { Display } from "../../../components/editorial/Display";
+import { Eyebrow } from "../../../components/editorial/Eyebrow";
+import { api, getProductById } from "../../../lib/api";
 import { formatPrice } from "../../../lib/auth";
-import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
-import { Card, CardContent } from "../../../components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../../components/ui/tabs";
 
 export default async function ProductDetailPage({
   params,
@@ -25,142 +19,206 @@ export default async function ProductDetailPage({
   const allProducts = await api.getProducts();
   const related = allProducts.filter((p) => p.id !== id).slice(0, 3);
 
+  const specs: Array<[string, string]> = [
+    ["Diameter", "6 mm"],
+    ["Length", "27 mm"],
+    ["Carbon source", "Coconut shell, food-grade"],
+    ["Activation", "Steam"],
+    ["Use", "Single — one cigarette, one filter"],
+    ["In stock", `${product.stock} packs`],
+  ];
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
-      <Link
-        href="/products"
-        className="text-xs text-[color:var(--muted)] hover:text-[color:var(--foreground)]"
-      >
-        ← Back to filters
-      </Link>
+    <div className="mx-auto max-w-[1400px] px-6 sm:px-10">
+      {/* Breadcrumb */}
+      <nav className="pt-10 pb-6 text-[11px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+        <Link href="/products" className="hover:text-[color:var(--accent)]">
+          ← Filters
+        </Link>
+      </nav>
 
-      <div className="mt-6 grid gap-10 md:grid-cols-2">
-        {/* Gallery */}
-        <Card className="bg-[color:var(--surface-1)] border-[color:var(--border)]">
-          <CardContent className="flex aspect-square items-center justify-center p-10">
-            <svg
-              viewBox="0 0 320 320"
-              className="w-full max-w-xs text-[color:var(--accent)]"
-              fill="none"
-              aria-hidden
+      {/* Header ----------------------------------------------------------- */}
+      <header className="pb-20">
+        <div className="grid gap-16 md:grid-cols-12 items-end border-t border-[color:var(--border)] pt-10">
+          <div className="md:col-span-7">
+            <Eyebrow>CX/{id.slice(0, 6).toUpperCase()}</Eyebrow>
+            <h1
+              className="mt-6 leading-[0.92] tracking-tight"
+              style={{ fontSize: "var(--text-display)" }}
             >
-              <circle
-                cx="160"
-                cy="160"
-                r="120"
-                stroke="currentColor"
-                strokeOpacity="0.25"
-                strokeWidth="2"
-              />
-              <circle
-                cx="160"
-                cy="160"
-                r="80"
-                stroke="currentColor"
-                strokeOpacity="0.4"
-                strokeWidth="2"
-              />
-              <rect
-                x="120"
-                y="60"
-                width="80"
-                height="200"
-                rx="40"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="var(--surface-2)"
-              />
-              <rect
-                x="120"
-                y="60"
-                width="80"
-                height="50"
-                rx="40"
-                fill="currentColor"
-                fillOpacity="0.85"
-              />
-            </svg>
-          </CardContent>
-        </Card>
-
-        {/* Spec */}
-        <div>
-          <Badge className="bg-[color:var(--surface-2)] text-[color:var(--accent)] border border-[color:var(--accent)]/30 hover:bg-[color:var(--surface-2)]">
-            6 mm activated charcoal
-          </Badge>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-            {product.name}
-          </h1>
-          <p className="mt-2 text-2xl text-[color:var(--accent)] font-mono">
-            {formatPrice(product.price_cents)}
-          </p>
-          {product.description ? (
-            <p className="mt-4 text-sm text-[color:var(--muted)] leading-relaxed">
-              {product.description}
-            </p>
-          ) : null}
-
-          <Button
-            disabled
-            className="mt-6 bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)] disabled:opacity-60 disabled:cursor-not-allowed"
-            title="Cart is coming soon"
-          >
-            Add to cart (coming soon)
-          </Button>
-
-          <Tabs defaultValue="overview" className="mt-10">
-            <TabsList className="bg-[color:var(--surface-2)]">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="spec">Spec</TabsTrigger>
-              <TabsTrigger value="honest">Honest answers</TabsTrigger>
-            </TabsList>
-            <TabsContent
-              value="overview"
-              className="text-sm text-[color:var(--muted)] leading-relaxed pt-4"
-            >
-              {product.description ?? "No description available."}
-            </TabsContent>
-            <TabsContent
-              value="spec"
-              className="text-sm text-[color:var(--muted)] pt-4"
-            >
-              <ul className="space-y-2">
-                <li>Diameter: 6 mm</li>
-                <li>Length: 27 mm</li>
-                <li>Carbon source: coconut shell</li>
-                <li>Single use</li>
-              </ul>
-            </TabsContent>
-            <TabsContent
-              value="honest"
-              className="text-sm text-[color:var(--muted)] leading-relaxed pt-4"
-            >
-              CharcoalX is a harm-reduction product. It does not make smoking
-              safe. If quitting is on the table, prefer that.
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-
-      {related.length > 0 && (
-        <section className="mt-20">
-          <h2 className="text-xl font-semibold tracking-tight mb-6">More filters</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {related.map((p) => (
-              <Link
-                key={p.id}
-                href={`/products/${p.id}`}
-                className="block rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-1)] p-4 hover:border-[color:var(--accent)]/40 transition-colors"
-              >
-                <p className="text-sm font-medium">{p.name}</p>
-                <p className="mt-1 text-xs text-[color:var(--accent)] font-mono">
-                  {formatPrice(p.price_cents)}
-                </p>
-              </Link>
-            ))}
+              {product.name}
+            </h1>
           </div>
-        </section>
-      )}
+          <div className="md:col-span-5 md:text-right">
+            <p
+              className="italic text-[color:var(--accent)] leading-none"
+              style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-display)" }}
+            >
+              {formatPrice(product.price_cents)}
+            </p>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-[color:var(--subtle)]">
+              per pack — incl. shipping
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <Asterisk />
+
+      {/* Description + CTA ----------------------------------------------- */}
+      <section className="pb-24">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-7">
+            {product.description ? (
+              <p
+                className="leading-snug tracking-tight max-w-2xl"
+                style={{ fontSize: "var(--text-2xl)" }}
+              >
+                {product.description}
+              </p>
+            ) : (
+              <p
+                className="leading-snug tracking-tight max-w-2xl text-[color:var(--muted)]"
+                style={{ fontSize: "var(--text-2xl)" }}
+              >
+                A 6&nbsp;mm activated-carbon tip designed for an honest, smoother draw.
+              </p>
+            )}
+          </div>
+          <div className="md:col-span-4 md:col-start-9">
+            <button
+              disabled
+              title="Cart is coming soon"
+              className="w-full inline-flex items-center justify-between border border-[color:var(--foreground)] px-6 py-4 text-sm uppercase tracking-[0.2em] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>Add to cart</span>
+              <span className="text-[10px] tracking-[0.18em] text-[color:var(--subtle)]">soon</span>
+            </button>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+              Cart launches with v2.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Asterisk />
+
+      {/* Spec sheet ------------------------------------------------------ */}
+      <section className="pb-24">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <Eyebrow>CX/SPEC</Eyebrow>
+            <h2
+              className="mt-6 leading-tight tracking-tight"
+              style={{ fontSize: "var(--text-3xl)" }}
+            >
+              The <Display>spec.</Display>
+            </h2>
+          </div>
+          <dl className="md:col-span-8 divide-y divide-[color:var(--border)] border-t border-b border-[color:var(--border)]">
+            {specs.map(([k, v]) => (
+              <div key={k} className="grid grid-cols-12 py-5 items-baseline">
+                <dt className="col-span-5 text-[11px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+                  {k}
+                </dt>
+                <dd className="col-span-7 text-base text-[color:var(--foreground)]">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <Asterisk />
+
+      {/* Honest answers -------------------------------------------------- */}
+      <section className="pb-24">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <Eyebrow>CX/HONEST</Eyebrow>
+            <h2
+              className="mt-6 leading-tight tracking-tight"
+              style={{ fontSize: "var(--text-3xl)" }}
+            >
+              Honest <Display>answers.</Display>
+            </h2>
+          </div>
+          <div className="md:col-span-8 space-y-8">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+                Does this make smoking safe?
+              </p>
+              <p className="mt-3 text-base text-[color:var(--foreground)] leading-relaxed">
+                No. Smoking remains harmful. CharcoalX is a harm-reduction filter that adsorbs particulate and tar for a cleaner draw — not a health product, and not a substitute for quitting. If quitting is on the table, choose that.
+              </p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+                Will it ruin the flavor?
+              </p>
+              <p className="mt-3 text-base text-[color:var(--foreground)] leading-relaxed">
+                It removes some particulate and acrid notes. Most people describe the draw as smoother, not flavorless. Strong tobaccos still taste like themselves.
+              </p>
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+                One filter, one cigarette?
+              </p>
+              <p className="mt-3 text-base text-[color:var(--foreground)] leading-relaxed">
+                Yes. Activated carbon saturates as it works. Reusing a filter past one cigarette stops giving you the benefit you paid for.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Related --------------------------------------------------------- */}
+      {related.length > 0 ? (
+        <>
+          <Asterisk />
+          <section className="pb-32">
+            <header className="grid gap-8 md:grid-cols-12 border-t border-[color:var(--border)] pt-10 mb-10">
+              <div className="md:col-span-4">
+                <Eyebrow>CX/MORE</Eyebrow>
+              </div>
+              <h2
+                className="md:col-span-8 leading-tight tracking-tight"
+                style={{ fontSize: "var(--text-3xl)" }}
+              >
+                More from the <Display>line.</Display>
+              </h2>
+            </header>
+            <ul className="border-t border-[color:var(--border)]">
+              {related.map((p, i) => (
+                <li key={p.id} className="border-b border-[color:var(--border)] group">
+                  <Link
+                    href={`/products/${p.id}`}
+                    className="grid grid-cols-12 gap-6 items-baseline py-6 transition-colors hover:bg-[color:var(--surface-2)]/50"
+                  >
+                    <span
+                      className="col-span-1 italic text-[color:var(--accent)]"
+                      style={{ fontFamily: "var(--font-serif)", fontSize: "var(--text-xl)" }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3 className="col-span-12 md:col-span-7 text-lg font-medium tracking-tight">
+                      {p.name}
+                    </h3>
+                    <p className="col-span-6 md:col-span-3 font-mono text-base tabular-nums">
+                      {formatPrice(p.price_cents)}
+                    </p>
+                    <span
+                      className="col-span-6 md:col-span-1 text-right text-sm uppercase tracking-[0.2em] text-[color:var(--muted)] group-hover:text-[color:var(--accent)] transition-colors"
+                      aria-hidden
+                    >
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      ) : null}
     </div>
   );
 }
