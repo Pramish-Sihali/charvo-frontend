@@ -19,11 +19,13 @@
   --muted:             #5b5b5e;
   --subtle:            #8c8c8e;
 
-  /* accent (editorial — used sparingly) */
-  --accent:            #c08552;
-  --accent-strong:     #a76e3d;
+  /* accent — Mixed Greens (editorial, used sparingly) */
+  --accent:            #386A20;  /* forest — primary editorial accent */
+  --accent-strong:     #089038;  /* vibrant — hover/active state */
+  --accent-medium:     #75AA47;  /* grass — secondary surfaces */
+  --accent-light:      #93CB56;  /* lime — subtle highlights */
   --accent-foreground: #ffffff;
-  --ring:              #c08552;
+  --ring:              #089038;
 
   /* status */
   --danger:  #b34238;
@@ -58,6 +60,8 @@
   --color-subtle:            var(--subtle);
   --color-accent:            var(--accent);
   --color-accent-strong:     var(--accent-strong);
+  --color-accent-medium:     var(--accent-medium);
+  --color-accent-light:      var(--accent-light);
   --color-accent-foreground: var(--accent-foreground);
   --color-ring:              var(--ring);
   --color-danger:            var(--danger);
