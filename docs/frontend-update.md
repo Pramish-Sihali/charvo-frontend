@@ -2,51 +2,75 @@
 
 _Last updated: 2026-05-10. Spec: `docs/superpowers/specs/2026-05-10-charvo-filter-redesign.md`. Plan: `docs/superpowers/plans/2026-05-10-charvo-filter-redesign.md`._
 
-## What changed
+## What this is
 
-This pass migrated the storefront from a hand-rolled component layer to shadcn/ui primitives (Base UI under the hood for most), refined the design tokens with fluid `clamp()` typography, added two pages (`/products/[id]`, `/science`), and replaced the FAQ + product card surfaces with composed shadcn primitives (the planned 21st.dev block imports were attempted but the candidates returned by the MCP did not match the project's CSS-variable token system, so hand-built equivalents were used).
+A light, paper-toned editorial storefront for CharcoalX (harm-reduction cigarette filters). Designed to feel closer to an editorial magazine than to a generic ecommerce template — typography-first, hairlines instead of borders, generous whitespace, single accent used sparingly.
 
-The cascading-render error in `SiteHeader` that triggered the redesign was fixed prior to this work — the component now uses `useSyncExternalStore` against `localStorage` via helpers in `lib/auth.ts`. That pattern is the canonical browser-state pattern for the project.
+The earlier dark warm-charcoal version was rebuilt in this pass into the editorial system documented below. Aesthetic reference: betteroff.studio.
+
+## Design principles
+
+1. **Typography is the design.** Massive display headlines (`var(--text-display)`, up to ~7.5rem). Italic serif accent words inside sans headlines via `<Display>`. Tight tracking on display sizes, leading-0.95 to -0.92.
+2. **Hairlines, not borders.** Dividers are 1px at `--border` opacity (~12% of foreground). No drop shadows, almost no border-radius.
+3. **Generous vertical rhythm.** Sections run `py-32` (8 rem) on desktop. Asterisk (`<Asterisk />`) renders centered between major sections.
+4. **Numbered sections.** Each major area carries a `CX/NN — Label` eyebrow rendered by `<Eyebrow>` or wrapped by `<SectionHeader>`.
+5. **Asymmetric grids.** 12-col grids with content offset (e.g. headline `col-span-7`, blurb `col-start-9 col-span-4`).
+6. **Single accent, used sparingly.** Forest green (`--accent: #386A20`) appears on numbered markers, italic serif words, focus states, and one CTA per surface. Body text and most links remain near-black.
+7. **No card chrome on editorial surfaces.** Forms use bottom-bordered hairline inputs (no shadcn `Form`/`Input`). Product listings are hairline tables, not card grids.
 
 ## Tokens
 
-All colour, radius, and type tokens live in `app/globals.css` under `:root` and are exposed to Tailwind via `@theme inline`. Consume them in JSX as `[color:var(--token)]` (Tailwind v4 arbitrary-value syntax).
+Tokens live in `app/globals.css` under `:root` and are exposed to Tailwind via `@theme inline`. Consume in JSX as `[color:var(--token)]` (Tailwind v4 arbitrary-value syntax).
 
-| Token | Use |
-|---|---|
-| `--background` | Body and section backgrounds |
-| `--surface-1` | Cards, header/footer surfaces |
-| `--surface-2` | Inputs, badges, hover states |
-| `--surface-3` | Pressed/active surfaces |
-| `--border` | Default divider |
-| `--border-strong` | Emphasised divider |
-| `--foreground` | Body text |
-| `--muted` | Secondary text |
-| `--subtle` | Tertiary / metadata text |
-| `--accent` | Brand amber, primary CTAs |
-| `--accent-strong` | Hover state of accent |
-| `--accent-foreground` | Text on accent surfaces |
-| `--ring` | Focus ring |
-| `--danger`, `--success` | Status colours |
+| Token | Hex / value | Use |
+|---|---|---|
+| `--background` | `#f6f3ee` | Body — warm paper |
+| `--surface-1` | `#ffffff` | Pure-white inset surfaces (rare) |
+| `--surface-2` | `#ede8df` | Hover tint, skeleton fill |
+| `--surface-3` | `#e2dccf` | Pressed/active surface |
+| `--border` | `rgba(14,14,16,0.12)` | Default hairline |
+| `--border-strong` | `rgba(14,14,16,0.24)` | Form input underline |
+| `--foreground` | `#0e0e10` | Body text |
+| `--muted` | `#5b5b5e` | Secondary text |
+| `--subtle` | `#8c8c8e` | Tertiary / metadata |
+| `--accent` | `#386A20` (forest) | Primary editorial accent — section markers, italic words, default CTA underline |
+| `--accent-strong` | `#089038` (vibrant) | Hover / active state of accent |
+| `--accent-medium` | `#75AA47` (grass) | Reserved for secondary accents |
+| `--accent-light` | `#93CB56` (lime) | Reserved for subtle highlights |
+| `--accent-foreground` | `#ffffff` | Text on accent fills |
+| `--ring` | `#089038` | Focus ring |
+| `--danger` | `#b34238` | Errors |
+| `--success` | `#2f7a3a` | Success messages |
 
-Contrast: body text on `--background` ≥ 4.5:1. Accent on `--background` is reserved for ≥ 18 px (or ≥ 14 px bold).
+Type uses fluid `clamp()` scales: `--text-xs … --text-5xl` plus a hero-only `--text-display` (≈ clamp 3rem to 7.5rem).
 
-Type uses fluid `clamp()` scales (`--text-xs` … `--text-5xl`). Headings should reach for `--text-3xl` and up; body text uses `--text-base`.
+Fonts (loaded via `next/font/google` in `app/layout.tsx`):
+- **Geist Sans** — body and most headings (`var(--font-sans)`)
+- **Geist Mono** — prices, IDs (`var(--font-mono)`)
+- **Instrument Serif** — italic accent words inside headlines, decorative numbers (`var(--font-serif)`)
+
+## Editorial primitives
+
+In `components/editorial/`:
+
+- **`SectionHeader`** — numbered section header. Props: `number` (e.g. "01"), `label` (e.g. "Filters"), `title` (ReactNode), optional `blurb`. Renders a 12-col grid with the `CX/NN — LABEL` marker on the left and a large title + blurb on the right.
+- **`Asterisk`** — centered `✻` in italic serif accent. Used between major sections.
+- **`Eyebrow`** — small-caps tracked label in accent color. Use when you need just the marker without the full SectionHeader grid.
+- **`Display`** — inline serif-italic accent span. Wrap accent words inside otherwise-sans headlines: `<h1>Smoke <Display>smarter.</Display></h1>`.
 
 ## Component inventory
 
-**Primitives** (CLI-owned, in `components/ui/`):
+**shadcn primitives** (in `components/ui/`, mostly used inside the auth/order pages and select moments — most surfaces avoid them in favor of raw editorial JSX):
 `accordion`, `badge`, `button`, `card`, `form`, `input`, `label`, `separator`, `sheet`, `skeleton`, `sonner`, `tabs`. Source: https://ui.shadcn.com.
 
-> Note: this version of shadcn ships most primitives on **Base UI** (`@base-ui/react`) rather than Radix. APIs differ slightly from documentation you may have seen for Radix-based shadcn. `form.tsx` still uses Radix Label/Slot. `Button` does not support `asChild` — wrap a `<Link>` in styling classes instead of using `<Button asChild><Link/></Button>`.
+> Note: this version of shadcn ships most primitives on **Base UI** (`@base-ui/react`) rather than Radix. APIs differ slightly. `Button` does not support `asChild` — wrap a `<Link>` in styling classes instead.
 
 **Project components**:
-- `SiteHeader.tsx` — auth-aware nav, uses `useSyncExternalStore`.
-- `SiteFooter.tsx` — three-column footer.
-- `FAQAccordion.tsx` — wraps the Base UI `Accordion`. Uses `value={i}` per item; the root has no `type`/`collapsible` props (it defaults to single-open).
-- `ScienceDiagram.tsx` — inline SVG of activated-carbon adsorption.
-- `HeroBlock.tsx` — hand-built hero (the planned 21st.dev import did not produce token-compatible code in this pass; the file is structured so a future swap drops a single component in).
-- `ProductGrid.tsx` — hand-built product grid for the same reason.
+- `SiteHeader.tsx` — minimal editorial nav, auth-aware via `useSyncExternalStore`. Logo: "Charcoal" + italic serif "X" + "®" mark.
+- `SiteFooter.tsx` — three-column footer with a large display headline at the left.
+- `ProductIndex.tsx` — table-style product listing (replaced the old card grid).
+- `ScienceDiagram.tsx` — hairline SVG of activated-carbon adsorption with serif italic labels.
+- `editorial/SectionHeader.tsx`, `Asterisk.tsx`, `Eyebrow.tsx`, `Display.tsx` — see above.
 
 ## Adding a new shadcn component
 
@@ -54,40 +78,28 @@ Type uses fluid `clamp()` scales (`--text-xs` … `--text-5xl`). Headings should
 npx shadcn@latest add <component-name> --yes --overwrite
 ```
 
-Lands in `components/ui/<component-name>.tsx`. Do not hand-edit primitives except to swap colour classes for project CSS variables. If the component fails to install or imports a missing peer dep, install it manually then re-run.
-
-## Swapping `HeroBlock.tsx` or `ProductGrid.tsx` for a 21st.dev block (future)
-
-Each block is a single self-contained file. To swap:
-
-1. Use `mcp__21st-magic__21st_magic_component_inspiration` to find candidates. Verify the candidate uses Tailwind utility classes you can rewrite to CSS-variable references — reject anything that depends on `text-muted-foreground` (different token system) or external image hosts that you cannot serve.
-2. Use `mcp__21st-magic__21st_magic_component_builder` to generate the code into the target file.
-3. Audit for hex colours; replace with `[color:var(--…)]` references.
-4. Add a comment at the top of the file: `// Source: <21st.dev URL or block name>`.
-
-If neither block import yields a usable result, the hand-built fallbacks already in place are acceptable indefinitely.
+Lands in `components/ui/<component-name>.tsx`. Hand-edit only to swap colour classes for project CSS variables.
 
 ## Conventions
 
-- **Browser state**: read with `useSyncExternalStore`, never `useEffect` + `useState` synchronisation in the body of the effect. See `components/SiteHeader.tsx` for the canonical pattern. `setState` inside `.then()` of a Promise is allowed.
-- **No hex outside `app/globals.css`**: every colour in TSX must be a `--token`.
-- **Forms**: react-hook-form + zod + shadcn `Form`. Errors render via `<FormMessage />`; user-facing toasts via Sonner (`import { toast } from "sonner"`).
-- **Loading states**: `Skeleton` placeholders, not spinners, for content blocks.
-- **Icons**: `lucide-react` only.
-- **Auth API surface**: `lib/api.ts` exposes methods on an `api` object (`api.login({ email, password })`, `api.register({ email, password, full_name })`, `api.getMyOrders()`, etc.). Returns include `access_token` (snake_case) — pass to `saveSession(access_token, user)`.
-- **Field naming**: API responses use snake_case (`price_cents`, `created_at`, `total_cents`, `image_url`). Don't rename in the client; render directly.
+- **Browser state**: `useSyncExternalStore` for anything that reads `localStorage` or other external mutable state. See `components/SiteHeader.tsx`. `setState` synchronously inside `useEffect` body is forbidden by Next 16; `setState` inside `.then()` of a Promise is allowed (see `app/products/page.tsx`).
+- **No hex outside `app/globals.css`**: every colour in TSX uses `[color:var(--token)]`. SVG fills/strokes inside JSX should use `currentColor` and rely on the parent's `text-[color:var(--…)]`.
+- **Forms**: prefer hairline-bottom inputs in the editorial style. Auth uses react-hook-form + zod + Sonner toasts. Errors render below each field as small text in `--danger`.
+- **Loading states**: `Skeleton` placeholders with `bg-[color:var(--surface-2)] rounded-none` to match the hairline aesthetic.
+- **Icons**: `lucide-react` only when truly needed. Most "icons" in this design are typographic (arrows `→`, `✻`, `+`).
+- **API surface**: `lib/api.ts` exposes methods on an `api` object (`api.login({ email, password })`, `api.register({ email, password, full_name })`, `api.getMyOrders()`, `api.getProducts()`). Returns include `access_token` (snake_case) — pass to `saveSession(access_token, user)`.
+- **Field naming**: API responses use snake_case (`price_cents`, `created_at`, `total_cents`, `image_url`). Render directly without renaming.
 - **Next 16 docs**: when uncertain, read `node_modules/next/dist/docs/` (per `AGENTS.md`).
 
 ## Known limitations
 
 - Mocked product data via the FastAPI backend; no CMS.
 - No cart / checkout / About page yet. The "Add to cart" button on product detail is intentionally disabled.
-- Product detail route is `/products/[id]` (uses the product `id` field, not a separate `slug`). If SEO-friendly slugs are needed later, add a `slug` field server-side and alias the route.
-- No light mode.
-- No real product photography (SVG placeholders).
+- Product detail route is `/products/[id]` (uses the product `id` field, not a `slug`).
+- No light / dark mode toggle — the design is light-only by intent.
+- No real product photography (the design is typography-first; imagery deferred).
 - `/orders/[id]` per-order detail not yet built.
 - No automated UI tests.
-- 21st.dev block imports were attempted but produced non-token-based code; hand-built fallbacks are in use.
 
 ## Versions installed
 
