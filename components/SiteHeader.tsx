@@ -26,50 +26,46 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="border-b border-[color:var(--border)] bg-[color:var(--background)]/80 backdrop-blur sticky top-0 z-20">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 group">
+    <header className="border-b border-[color:var(--border)]">
+      <div className="mx-auto flex max-w-[1400px] items-baseline justify-between px-6 sm:px-10 py-6">
+        <Link href="/" className="group inline-flex items-baseline gap-1">
+          <span className="text-base font-semibold tracking-tight">
+            Charcoal
+          </span>
           <span
-            aria-hidden
-            className="inline-block h-7 w-7 rounded-full bg-[color:var(--accent)] ring-2 ring-[color:var(--accent-strong)]/30 transition-transform group-hover:scale-105"
-          />
-          <span className="text-lg font-semibold tracking-tight">
-            CharcoalX
+            className="text-base font-normal italic text-[color:var(--accent)]"
+            style={{ fontFamily: "var(--font-serif)" }}
+          >
+            X
+          </span>
+          <span className="ml-2 text-[10px] uppercase tracking-[0.2em] text-[color:var(--subtle)]">
+            ®
           </span>
         </Link>
-        <nav className="flex items-center gap-2 text-sm">
-          <Link
-            href="/products"
-            className="px-3 py-2 rounded-md hover:bg-[color:var(--surface-2)]"
-          >
+        <nav className="flex items-center gap-8 text-[11px] uppercase tracking-[0.18em]">
+          <Link href="/products" className="hover:text-[color:var(--accent)] transition-colors">
             Filters
+          </Link>
+          <Link href="/science" className="hover:text-[color:var(--accent)] transition-colors">
+            Science
           </Link>
           {user ? (
             <>
-              <Link
-                href="/orders"
-                className="px-3 py-2 rounded-md hover:bg-[color:var(--surface-2)]"
-              >
+              <Link href="/orders" className="hover:text-[color:var(--accent)] transition-colors">
                 Orders
               </Link>
-              <button
-                onClick={onLogout}
-                className="px-3 py-2 rounded-md text-[color:var(--muted)] hover:text-[color:var(--foreground)] hover:bg-[color:var(--surface-2)]"
-              >
+              <button onClick={onLogout} className="hover:text-[color:var(--accent)] transition-colors">
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="px-3 py-2 rounded-md hover:bg-[color:var(--surface-2)]"
-              >
+              <Link href="/login" className="hover:text-[color:var(--accent)] transition-colors">
                 Sign in
               </Link>
               <Link
                 href="/register"
-                className="px-3 py-2 rounded-md bg-[color:var(--accent)] text-zinc-900 font-medium hover:bg-[color:var(--accent-strong)]"
+                className="border-b border-[color:var(--foreground)] pb-0.5 hover:text-[color:var(--accent)] hover:border-[color:var(--accent)] transition-colors"
               >
                 Register
               </Link>

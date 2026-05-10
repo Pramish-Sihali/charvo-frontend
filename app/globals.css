@@ -4,34 +4,36 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* surfaces */
-  --background:        #0b0b0d;
-  --surface-1:         #141417;
-  --surface-2:         #1c1c20;
-  --surface-3:         #26262b;
-  --border:            #2e2e34;
-  --border-strong:     #3a3a42;
+  /* paper surfaces */
+  --background:        #f6f3ee;
+  --surface-1:         #ffffff;
+  --surface-2:         #ede8df;
+  --surface-3:         #e2dccf;
+
+  /* hairlines */
+  --border:            rgba(14,14,16,0.12);
+  --border-strong:     rgba(14,14,16,0.24);
 
   /* foreground */
-  --foreground:        #f4f4f5;
-  --muted:             #a1a1aa;
-  --subtle:            #71717a;
+  --foreground:        #0e0e10;
+  --muted:             #5b5b5e;
+  --subtle:            #8c8c8e;
 
-  /* accent */
+  /* accent (editorial — used sparingly) */
   --accent:            #c08552;
-  --accent-strong:     #d49a6a;
-  --accent-foreground: #1a1208;
-  --ring:              #d49a6a;
+  --accent-strong:     #a76e3d;
+  --accent-foreground: #ffffff;
+  --ring:              #c08552;
 
   /* status */
-  --danger:  #f87171;
-  --success: #4ade80;
+  --danger:  #b34238;
+  --success: #2f7a3a;
 
-  /* radii */
-  --radius:    0.5rem;
-  --radius-lg: 0.75rem;
+  /* radii — editorial means almost no roundness */
+  --radius:    0.25rem;
+  --radius-lg: 0.375rem;
 
-  /* fluid type */
+  /* fluid display type — confident, almost arrogant */
   --text-xs:   clamp(0.75rem, 0.72rem + 0.15vw, 0.81rem);
   --text-sm:   clamp(0.875rem, 0.84rem + 0.18vw, 0.95rem);
   --text-base: clamp(1rem,    0.96rem + 0.2vw,  1.075rem);
@@ -39,8 +41,9 @@
   --text-xl:   clamp(1.25rem,  1.18rem + 0.36vw, 1.4rem);
   --text-2xl:  clamp(1.5rem,   1.4rem + 0.5vw,   1.75rem);
   --text-3xl:  clamp(1.875rem, 1.7rem + 0.88vw,  2.5rem);
-  --text-4xl:  clamp(2.25rem,  2rem + 1.25vw,    3.25rem);
-  --text-5xl:  clamp(2.75rem,  2.4rem + 1.75vw,  4rem);
+  --text-4xl:  clamp(2.5rem,   2rem + 2vw,       4rem);
+  --text-5xl:  clamp(3.5rem,   2.5rem + 4vw,     6rem);
+  --text-display: clamp(3rem,  2rem + 7vw,       7.5rem);
 }
 
 @theme inline {
@@ -61,6 +64,7 @@
   --color-success:           var(--success);
   --font-sans:               var(--font-geist-sans);
   --font-mono:               var(--font-geist-mono);
+  --font-serif:              var(--font-instrument-serif);
   --radius:                  var(--radius);
 }
 
@@ -68,9 +72,29 @@ html, body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-feature-settings: "ss01", "cv11";
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+/* editorial details */
+.editorial-rule {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
+}
+
+.editorial-asterisk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-style: italic;
+  color: var(--accent);
+  font-size: 1.5rem;
+  letter-spacing: 0.5em;
+  padding: 4rem 0;
 }
