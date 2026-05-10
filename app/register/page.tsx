@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 import { api } from "../../lib/api";
 import { saveSession } from "../../lib/auth";
 
@@ -39,37 +39,50 @@ export default function RegisterPage() {
         One account, your order history. No marketing emails.
       </p>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <Input
-          name="full_name"
-          label="Full name"
-          autoComplete="name"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-        />
-        <Input
-          name="email"
-          type="email"
-          label="Email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          name="password"
-          type="password"
-          label="Password"
-          autoComplete="new-password"
-          minLength={6}
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <label className="flex flex-col gap-1.5" htmlFor="full_name">
+          <span className="text-sm font-medium text-[color:var(--foreground)]">Full name</span>
+          <Input
+            id="full_name"
+            name="full_name"
+            autoComplete="name"
+            required
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1.5" htmlFor="email">
+          <span className="text-sm font-medium text-[color:var(--foreground)]">Email</span>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1.5" htmlFor="password">
+          <span className="text-sm font-medium text-[color:var(--foreground)]">Password</span>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            minLength={6}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
         {error && (
           <p className="text-sm text-[color:var(--danger)]">{error}</p>
         )}
-        <Button type="submit" fullWidth disabled={submitting}>
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)]"
+        >
           {submitting ? "Creating account…" : "Create account"}
         </Button>
       </form>

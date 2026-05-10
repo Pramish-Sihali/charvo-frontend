@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
+import { Toaster } from "../components/ui/sonner";
 
 import "./globals.css";
 
@@ -36,6 +37,7 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { Button } from "../../components/Button";
+import { Button } from "../../components/ui/button";
 import { ApiError, api, type Product } from "../../lib/api";
 import { formatPrice, getToken } from "../../lib/auth";
 
@@ -26,6 +26,7 @@ export default function ProductsPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
   }, [refresh]);
 
@@ -141,7 +142,7 @@ export default function ProductsPage() {
                     <Button
                       onClick={() => buy(p)}
                       disabled={p.stock === 0 || busyId === p.id}
-                      fullWidth
+                      className="w-full bg-[color:var(--accent)] text-[color:var(--accent-foreground)] hover:bg-[color:var(--accent-strong)]"
                     >
                       {busyId === p.id ? "Placing…" : p.stock === 0 ? "Sold out" : "Buy"}
                     </Button>
