@@ -87,10 +87,9 @@ export function HeroCollage() {
     };
   }, []);
 
-  // Fade fully out a bit before progress reaches 1 so cells are gone by the time
-  // user reaches the next section.
-  const fade = Math.max(0, 1 - progress * 1.4);
-  const opacity = BASE_OPACITY * fade;
+  // Reveal: cells start at BASE_OPACITY and grow more prominent as the user
+  // scrolls through the hero, settling at near-full opacity.
+  const opacity = Math.min(0.95, BASE_OPACITY + progress * 0.6);
 
   return (
     <div
