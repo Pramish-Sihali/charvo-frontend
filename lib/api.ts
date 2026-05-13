@@ -86,6 +86,8 @@ export const api = {
 
   getProducts: () => request<Product[]>("/api/products"),
 
+  getProduct: (id: string) => request<Product>(`/api/products/${id}`),
+
   createOrder: (body: { product_id: string; quantity: number }) =>
     request<Order>("/api/orders", {
       method: "POST",
@@ -101,8 +103,12 @@ export async function getProducts(): Promise<Product[]> {
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-  const products = await getProducts();
-  return products.find((p) => p.id === id) ?? null;
+  try {
+    return await api.getProduct(id);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
 }
 
 export { ApiError };

@@ -1,16 +1,24 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Asterisk } from "../components/editorial/Asterisk";
 import { Display } from "../components/editorial/Display";
 import { Eyebrow } from "../components/editorial/Eyebrow";
+import { HeroCollage } from "../components/HeroCollage";
 import { SectionHeader } from "../components/editorial/SectionHeader";
+import { CATEGORIES, CATEGORY_ORDER } from "../lib/catalog";
 
 export default function Home() {
   return (
     <div className="mx-auto max-w-[1400px] px-6 sm:px-10">
       {/* Hero ----------------------------------------------------------- */}
-      <section className="pt-20 pb-32 md:pt-32 md:pb-40">
-        <div className="grid gap-16 md:grid-cols-12 items-end">
+      <section className="relative pt-20 pb-32 md:pt-32 md:pb-40 overflow-hidden">
+
+        {/* Bento collage — scroll-released */}
+        <HeroCollage />
+
+        {/* Content */}
+        <div className="relative z-10 grid gap-16 md:grid-cols-12 items-end">
           <div className="md:col-span-9">
             <Eyebrow>CX/00 — Index</Eyebrow>
             <h1
@@ -46,7 +54,7 @@ export default function Home() {
         </div>
 
         {/* Stats strip */}
-        <dl className="mt-24 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-8 border-t border-[color:var(--border)] pt-10">
+        <dl className="relative z-10 mt-24 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-8 border-t border-[color:var(--border)] pt-10">
           {[
             { k: "6 mm", v: "Industry-standard tip" },
             { k: "≤ 30 s", v: "Saturation per cigarette" },
@@ -171,6 +179,61 @@ export default function Home() {
               </p>
             </details>
           ))}
+        </div>
+      </section>
+
+      <Asterisk />
+
+      {/* Shop by category ---------------------------------------------- */}
+      <section className="pb-32">
+        <SectionHeader
+          number="03"
+          label="Shop the line"
+          title={
+            <>
+              Three formats, <Display>one core.</Display>
+            </>
+          }
+          blurb="Filters, rolling papers, and full kits — all built around the same activated charcoal tip."
+        />
+        <div className="mt-16 grid gap-6 md:grid-cols-3">
+          {CATEGORY_ORDER.map((cat) => {
+            const { label, blurb, heroImage } = CATEGORIES[cat];
+            return (
+              <Link
+                key={cat}
+                href={`/products#${cat}`}
+                className="group block"
+              >
+                <div
+                  className="relative overflow-hidden bg-[color:var(--surface-2)]"
+                  style={{ aspectRatio: "3/4" }}
+                >
+                  <Image
+                    src={heroImage}
+                    alt={label}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
+                <div className="mt-5 border-t border-[color:var(--border)] pt-4">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="text-lg font-medium tracking-tight">{label}</h3>
+                    <span
+                      className="text-sm uppercase tracking-[0.2em] text-[color:var(--muted)] group-hover:text-[color:var(--accent)] transition-colors"
+                      aria-hidden
+                    >
+                      →
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-[color:var(--muted)] leading-relaxed">
+                    {blurb}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
