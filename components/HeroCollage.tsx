@@ -44,13 +44,13 @@ const CELLS: Cell[] = [
   },
   // Bottom-left — lifestyle smoke
   {
-    src: "/images/image (2).png",
+    src: "/images/image (5).png",
     gridClass: "col-start-1 row-start-3",
     drift: { x: -220, y: 220, rotate: -6 },
   },
   // Bottom wide — rolling action
   {
-    src: "/images/image (6).png",
+    src: "/images/image (3).png",
     gridClass: "col-start-2 col-span-2 row-start-3",
     drift: { x: 80, y: 280, rotate: 4 },
   },
